@@ -2339,12 +2339,21 @@ def p_statement_list(s, ctx, first_statement = 0):
     # Parse a series of statements separated by newlines.
     pos = s.position()
     stats = []
+
     while s.sy not in ('DEDENT', 'EOF'):
-        stat = p_statement(s, ctx, first_statement = first_statement)
+        try:
+            stat = p_statement(s, ctx, first_statement = first_statement)
+        except Exception as exc:
+            if s.fault_tolerant == True:
+                s.next()
+            else:
+                raise exc
+
         if isinstance(stat, Nodes.PassStatNode):
             continue
         stats.append(stat)
         first_statement = False
+
     if not stats:
         return Nodes.PassStatNode(pos)
     elif len(stats) == 1:

@@ -2,6 +2,7 @@ from Cython.TestUtils import CythonTest
 from Cython.Compiler.TreeFragment import *
 from Cython.Compiler.Nodes import *
 from Cython.Compiler.UtilNodes import *
+from Cython.Compiler.Errors import local_errors
 import Cython.Compiler.Naming as Naming
 
 class TestTreeFragments(CythonTest):
@@ -58,6 +59,26 @@ class TestTreeFragments(CythonTest):
         self.assertTrue(isinstance(s[0].expr, TempRefNode))
         self.assertTrue(isinstance(s[1].rhs, TempRefNode))
         self.assertTrue(s[0].expr.handle is s[1].rhs.handle)
+
+    def test_parse_fault_tolerant_complete(self):
+        code = u'''
+def method():
+    pass
+
+def method2():
+    error_here =
+
+def method3():
+    error_here =
+
+def method4():
+    without_error_here = 10
+'''
+        with local_errors() as errors:
+            parse_from_strings("test_name", code, True)
+            print(errors)
+
+            #self.assertEqual("CompileError(<StringSourceDescriptor:test_name>, 6, 16), 'Expected an identifier or literal'", str(errors[0]))
 
 if __name__ == "__main__":
     import unittest

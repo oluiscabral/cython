@@ -38,7 +38,7 @@ class StringParseContext(Main.Context):
         return ModuleScope(module_name, parent_module=None, context=self)
 
 
-def parse_from_strings(name, code, pxds=None, level=None, initial_pos=None,
+def parse_from_strings(name, code, fault_tolerant=False, pxds=None, level=None, initial_pos=None,
                        context=None, allow_struct_enum_decorator=False):
     """
     Utility method to parse a (unicode) string of code. This is mostly
@@ -72,7 +72,7 @@ def parse_from_strings(name, code, pxds=None, level=None, initial_pos=None,
     buf = StringIO(code)
 
     scanner = PyrexScanner(buf, code_source, source_encoding = encoding,
-                     scope = scope, context = context, initial_pos = initial_pos)
+                     scope = scope, context = context, initial_pos = initial_pos, fault_tolerant=fault_tolerant)
     ctx = Parsing.Ctx(allow_struct_enum_decorator=allow_struct_enum_decorator)
 
     if level is None:
