@@ -7,6 +7,7 @@ from __future__ import absolute_import
 
 # This should be done automatically
 import cython
+from Cython.Compiler.Errors import report_error, CompileError
 cython.declare(Nodes=object, ExprNodes=object, EncodedString=object,
                bytes_literal=object, StringEncoding=object,
                FileSourceDescriptor=object, lookup_unicodechar=object, unicode_category=object,
@@ -2337,6 +2338,7 @@ def p_statement(s, ctx, first_statement = 0):
 
 def p_statement_list(s, ctx, first_statement = 0):
     # Parse a series of statements separated by newlines.
+    global stat
     pos = s.position()
     stats = []
 
@@ -2345,6 +2347,7 @@ def p_statement_list(s, ctx, first_statement = 0):
             stat = p_statement(s, ctx, first_statement = first_statement)
         except Exception as exc:
             if s.fault_tolerant == True:
+                report_error(CompileError(pos, "Internal Error: "+ str(exc)))
                 s.next()
             else:
                 raise exc
