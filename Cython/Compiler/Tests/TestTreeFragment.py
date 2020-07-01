@@ -76,9 +76,9 @@ def method4():
 '''
         with local_errors() as errors:
             parse_from_strings("test_name", code, True)
-            print(errors)
 
-            #self.assertEqual("CompileError(<StringSourceDescriptor:test_name>, 6, 16), 'Expected an identifier or literal'", str(errors[0]))
+        self.assertEqual("CompileError((<StringSourceDescriptor:test_name>, 6, 16), 'Expected an identifier or literal')", repr(errors[0]))
+        self.assertEqual("CompileError((<StringSourceDescriptor:test_name>, 9, 16), 'Expected an identifier or literal')", repr(errors[2]))
 
 if __name__ == "__main__":
     import unittest
