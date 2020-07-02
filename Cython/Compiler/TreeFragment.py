@@ -38,8 +38,8 @@ class StringParseContext(Main.Context):
         return ModuleScope(module_name, parent_module=None, context=self)
 
 
-def parse_from_strings(name, code, fault_tolerant=False, pxds=None, level=None, initial_pos=None,
-                       context=None, allow_struct_enum_decorator=False):
+def parse_from_strings(name, code, pxds=None, level=None, initial_pos=None,
+                       context=None, allow_struct_enum_decorator=False, fault_tolerant=False):
     """
     Utility method to parse a (unicode) string of code. This is mostly
     used for internal Cython compiler purposes (creating code snippets

@@ -8,6 +8,7 @@ from __future__ import absolute_import
 # This should be done automatically
 import cython
 from Cython.Compiler.Errors import report_error, CompileError
+
 cython.declare(Nodes=object, ExprNodes=object, EncodedString=object,
                bytes_literal=object, StringEncoding=object,
                FileSourceDescriptor=object, lookup_unicodechar=object, unicode_category=object,
@@ -2338,25 +2339,32 @@ def p_statement(s, ctx, first_statement = 0):
 
 def p_statement_list(s, ctx, first_statement = 0):
     # Parse a series of statements separated by newlines.
-    global stat
     pos = s.position()
     stats = []
-
     while s.sy not in ('DEDENT', 'EOF'):
+        # When processing statements in a fault-tolerant mode, it's possible
+        # that because some Node isn't properly constructed, internal errors
+        # happen (for instance if the right hand side of an assignment would
+        # be `None`, trying to access its `pos` would throw an
+        # AttributeError). For the fault-tolerant mode this is ok (we don't
+        # want to change the whole parser to accommodate that use-case, so,
+        # just report that as a `CompileError` so that it can be seen and
+        # proceed as usual).
+        stat = None
         try:
             stat = p_statement(s, ctx, first_statement = first_statement)
         except Exception as exc:
-            if s.fault_tolerant == True:
-                report_error(CompileError(pos, "Internal Error: "+ str(exc)))
+            if s.fault_tolerant:
+                if not isinstance(exc, CompileError):
+                    exc = CompileError(pos, "Internal Error: "+ str(exc))
+                report_error(exc)
                 s.next()
             else:
                 raise exc
-
         if isinstance(stat, Nodes.PassStatNode):
             continue
         stats.append(stat)
         first_statement = False
-
     if not stats:
         return Nodes.PassStatNode(pos)
     elif len(stats) == 1:

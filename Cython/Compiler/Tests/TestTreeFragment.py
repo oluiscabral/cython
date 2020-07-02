@@ -4,6 +4,7 @@ from Cython.Compiler.Nodes import *
 from Cython.Compiler.UtilNodes import *
 from Cython.Compiler.Errors import local_errors
 import Cython.Compiler.Naming as Naming
+from nt import stat
 
 class TestTreeFragments(CythonTest):
 
@@ -69,16 +70,29 @@ def method2():
     error_here =
 
 def method3():
-    error_here =
+    error_here.
 
 def method4():
-    without_error_here = 10
+    without_error = 10
+
+def method5():
+    error_here =
 '''
         with local_errors() as errors:
-            parse_from_strings("test_name", code, True)
-
+            stats = parse_from_strings("test_name", code, fault_tolerant=True).body.stats
+        self.assertIsInstance(stats[0], DefNode)
+        self.assertIsInstance(stats[0].body, PassStatNode)
+        self.assertIsInstance(stats[1], DefNode)
+        self.assertIsNone(stats[1].body)
+        self.assertIsInstance(stats[2], DefNode)
+        self.assertIsInstance(stats[2].body, ExprStatNode)
+        self.assertIsInstance(stats[3], DefNode)
+        self.assertIsInstance(stats[3].body, SingleAssignmentNode)
+        self.assertIsInstance(stats[4], DefNode)
+        self.assertIsNone(stats[4].body)
         self.assertEqual("CompileError((<StringSourceDescriptor:test_name>, 6, 16), 'Expected an identifier or literal')", repr(errors[0]))
-        self.assertEqual("CompileError((<StringSourceDescriptor:test_name>, 9, 16), 'Expected an identifier or literal')", repr(errors[2]))
+        self.assertEqual("CompileError((<StringSourceDescriptor:test_name>, 9, 15), 'Expected an identifier')", repr(errors[2]))
+        self.assertEqual("CompileError((<StringSourceDescriptor:test_name>, 15, 16), 'Expected an identifier or literal')", repr(errors[3]))
 
 if __name__ == "__main__":
     import unittest
