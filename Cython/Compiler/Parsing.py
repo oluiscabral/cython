@@ -2350,7 +2350,6 @@ def p_statement_list(s, ctx, first_statement = 0):
         # want to change the whole parser to accommodate that use-case, so,
         # just report that as a `CompileError` so that it can be seen and
         # proceed as usual).
-        stat = None
         try:
             stat = p_statement(s, ctx, first_statement = first_statement)
         except Exception as exc:
@@ -2359,6 +2358,7 @@ def p_statement_list(s, ctx, first_statement = 0):
                     exc = CompileError(pos, "Internal Error: "+ str(exc))
                 report_error(exc)
                 s.next()
+                continue
             else:
                 raise exc
         if isinstance(stat, Nodes.PassStatNode):
