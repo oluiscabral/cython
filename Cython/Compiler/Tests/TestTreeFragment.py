@@ -79,7 +79,7 @@ def method5():
 '''
         with local_errors() as errors:
             stats = parse_from_strings("test_name", code, fault_tolerant=True).body.stats
-        self.assertTrue(len(stats) == 5)
+        self.assertEquals(len(stats), 5)
         self.assertIsInstance(stats[0], DefNode)
         self.assertEqual(str(stats[0].name), "method")
         self.assertIsInstance(stats[0].body, PassStatNode)
@@ -95,10 +95,12 @@ def method5():
         self.assertIsInstance(stats[4], DefNode)
         self.assertEqual(str(stats[4].name), "method5")
         self.assertIsInstance(stats[4].body, PassStatNode)
-        self.assertTrue(len(errors) == 5)
+        self.assertEquals(len(errors), 5)
         self.assertEqual("CompileError((<StringSourceDescriptor:test_name>, 6, 16), 'Expected an identifier or literal')", repr(errors[0]))
+        self.assertEqual("CompileError((<StringSourceDescriptor:test_name>, 6, 4), \"Internal Error: 'NoneType' object has no attribute 'pos'\")", repr(errors[1]))
         self.assertEqual("CompileError((<StringSourceDescriptor:test_name>, 9, 15), 'Expected an identifier')", repr(errors[2]))
         self.assertEqual("CompileError((<StringSourceDescriptor:test_name>, 15, 16), 'Expected an identifier or literal')", repr(errors[3]))
+        self.assertEqual("CompileError((<StringSourceDescriptor:test_name>, 15, 4), \"Internal Error: 'NoneType' object has no attribute 'pos'\")", repr(errors[4]))
 
 if __name__ == "__main__":
     import unittest

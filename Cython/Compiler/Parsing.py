@@ -2342,18 +2342,18 @@ def p_statement_list(s, ctx, first_statement = 0):
     pos = s.position()
     stats = []
     while s.sy not in ('DEDENT', 'EOF'):
-        # When processing statements in a fault-tolerant mode, it's possible
-        # that because some Node isn't properly constructed, internal errors
-        # happen (for instance if the right hand side of an assignment would
-        # be `None`, trying to access its `pos` would throw an
-        # AttributeError). For the fault-tolerant mode this is ok (we don't
-        # want to change the whole parser to accommodate that use-case, so,
-        # just report that as a `CompileError` so that it can be seen and
-        # proceed as usual).
         try:
             stat = p_statement(s, ctx, first_statement = first_statement)
         except Exception as exc:
             if s.fault_tolerant:
+                # When processing statements in a fault-tolerant mode, it's possible
+                # that because some Node isn't properly constructed, internal errors
+                # happen (for instance if the right hand side of an assignment would
+                # be `None`, trying to access its `pos` would throw an
+                # AttributeError). For the fault-tolerant mode this is ok (we don't
+                # want to change the whole parser to accommodate that use-case, so,
+                # just report that as a `CompileError` so that it can be seen and
+                # proceed as usual).
                 if not isinstance(exc, CompileError):
                     exc = CompileError(pos, "Internal Error: "+ str(exc))
                 report_error(exc)
